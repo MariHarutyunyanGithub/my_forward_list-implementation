@@ -19,10 +19,12 @@ class FList
         FList& operator+=(const FList&);
         friend std::ostream& operator<<(std::ostream & os, FList<T>& obj)  
         { 
+            Node<T>* tmphead = obj.getHead();
             while(obj.head != nullptr) {    
                 os << obj.head->getItem() << " ";
                 obj.head = obj.head->getNext();
-            }        
+            }  
+            obj.setHead(tmphead);      
             return os;
         }
 
