@@ -10,21 +10,20 @@ class FList
         FList();
         FList(const T&);
         FList(const FList&);
-        FList(const FList&&);
+        FList(FList&&);
         ~FList();
     public:
-        FList& operator=( FList&);
-        FList& operator=(const FList&&);
-        FList& operator+(const FList&);
+        FList& operator=(const FList&);
+        FList& operator=(FList&&);
+        FList operator+(const FList&);
         FList& operator+=(const FList&);
         friend std::ostream& operator<<(std::ostream & os, FList<T>& obj)  
         { 
-            Node<T>* tmphead = obj.getHead();
-            while(obj.head != nullptr) {    
-                os << obj.head->getItem() << " ";
-                obj.head = obj.head->getNext();
-            }  
-            obj.setHead(tmphead);      
+            Node<T>* current = obj.getHead();
+            while(current != nullptr) {    
+                os << current->getItem() << " ";
+                current = current->getNext();
+            }        
             return os;
         }
 
