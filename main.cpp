@@ -1,27 +1,28 @@
 #include <iostream>
 #include "forward_list.h"
 
-
 int main() {
     
-    FList<int> obj1(10);//10
-    obj1.insert(1,11);//11 10
-    obj1.insert(2,12);//11 10 12
-    obj1.insert(3,13);//11 10 12 13
-    obj1.insert(2,5);//11 10 5 12 13
-    obj1.insert(0,4);//
-    obj1.push_front(8);//8 11 10 5 12 13
-    obj1.remove_at(3);//8 11 10 12 13
-    obj1.remove_at(3);//8 11 10 13
-    obj1.setEntry(2,90);//8 11 90 13
-    std::cout << "my list : " << obj1 << std::endl;
-    //std::cout << obj1.getEntry(2) << std::endl;//10
-    //obj1.clear();
-    //FList<int> obj(5);
-    // obj.insert(1,4);
-    // obj.insert(1,8);
-    // obj1 = obj;
-    
-    //std::cout << obj1.isEmpty() <<std::endl;
+    FList<int> obj1(5);//5
+    obj1.insert(1,1);//1 5
+    obj1.insert(2,2);//1 2 5
+    obj1.insert(3,3);//1 2 3 5
+    obj1.insert(4,4);//1 2 3 4 5
+    obj1.insert(4,9);//1 2 3 9 4 5
+    obj1.insert(4,6);//1 2 3 6 9 4 5
+
+    FList<int> obj(9);
+    obj.insert(1,6);//6 9
+    obj.insert(2,7);//6 7 9
+    obj.insert(3,8);//6 7 8 9
+
+    std::cout << obj << std::endl;
+    std::cout << obj1 << std::endl;
+
+    FList<int> obj2;
+    obj2 = obj + obj1;   
+
+    std::cout << "my new list : " << obj2 << std::endl;
+
     return 0;
 }
