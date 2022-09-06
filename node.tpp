@@ -16,7 +16,7 @@ Node<T>::~Node()
 
 template<typename T>
 void Node<T>::setItem(const T& anItem)
-{
+{   
     item = anItem;
 }
 
