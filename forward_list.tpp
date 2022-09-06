@@ -4,115 +4,132 @@ FList<T>::FList() : head(nullptr), itemCount(0){}
 template<typename T>
 FList<T>::FList(const T& anItem) : itemCount(1)
 {
+    head = new Node<T>();
     head->setItem(anItem);
+    head->setNext(nullptr);
 }
 
 template<typename T>
 FList<T>::FList(const FList& other) :
-            itemCount{other.getItemCount()}
+            itemCount{other.itemCount}
 {
-    if (other.getHead() != nullptr) {
-        Node<T>* tmphead = head;
-        for (int i{}; i < itemCount; ++i) {            
-            head->setItem(other.getHead()->getItem()); 
-            head = head->getNext();  
-            other.setHead(other.getHead()->getNext());          
+    head = nullptr;
+    Node<T>* prevNode = nullptr;
+    Node<T>* otherNode = other.head;
+    for(;otherNode != nullptr; otherNode = otherNode->getNext())
+    {
+        Node<T>* newNode = new Node<T>;
+        newNode->setItem(otherNode->getItem());
+        newNode->setNext(nullptr);
+        if (!head) {
+            head = newNode;
         }
-        head = tmphead;
-        tmphead = nullptr;
+        else {
+            prevNode->setNext(newNode);
+        }
+        prevNode = newNode;
     }
 }
 
 template<typename T>
-FList<T>::FList(const FList&& other) :
+FList<T>::FList(FList&& other) :
             itemCount{other.itemCount}
 {
-    if (other.getHead() != nullptr) {
-       head = other.getHead();
-       other.setHead(nullptr);
+    if (other.head != nullptr) {
+       head = other.head;
+       other.head = nullptr;
     }
 }
 
 template<typename T>        
 FList<T>::~FList()  
 {
+    Node<T>* current = head;
+    while(current != nullptr) {
+        Node<T>* tmp = current;
+        current = current->getNext();
+        delete tmp;
+    }
     head = nullptr;
 }  
 
 template<typename T>
-FList<T>& FList<T>::operator=(FList& other)
+FList<T>& FList<T>::operator=(const FList& other)
 {
-    if (head == other.getHead()) {
+    if (head == other.head) {
         return *this;
     }
-    if (other.getHead() != nullptr) {
-        itemCount = other.getItemCount();
-        Node<T>* tmphead = head;   
-        for (int i{}; i < itemCount; ++i) {            
-            head->setItem(other.getHead()->getItem()); 
-            head = head->getNext();  
-            other.setHead(other.getHead()->getNext());          
-        }
-        head = tmphead;
-        tmphead = nullptr;
+    if (other.head != nullptr) {
+        itemCount = other.itemCount;
+
+        head = other.head;        
     }
     return *this;
 }
 
 template<typename T>
-FList<T>& FList<T>::operator=(const FList&& other)
+FList<T>& FList<T>::operator=(FList&& other)
 {
-    if (head == other.getHead()) {
+    if (head == other.head) {
         return *this;
     }
-    if (other.getHead() != nullptr) {
-        itemCount = other.getItemCount();   
-        head = other.getHead();
-        other.setHead(nullptr);
+    if (other.head != nullptr) {
+        itemCount = other.itemCount;   
+        head = other.head;
+        other.head = nullptr;
     }
     return *this;
 }
 
 template<typename T>
-FList<T>& FList<T>::operator+(const FList& other)
+FList<T> FList<T>::operator+(const FList& other)
 {
-    if (other.getHead() == nullptr) {
+    if (other.head == nullptr) {
         return *this;
     }
-    Node<T>* tmphead = head;
-    itemCount = itemCount > other.getItemCount() ? itemCount : other.getItemCount();
-    while ((head != nullptr) && (other.getHead() != nullptr)) {
-        head->setItem(head->getItem() + other.getHead()->getItem());
-        head = head->getNext();  
-        other.setHead(other.getHead()->getNext()); 
+    FList<T> result;
+    Node<T>* newNodeptr = new Node<T>(); 
+    result.head = newNodeptr;
+    Node<T>* current2 = result.head;
+    Node<T>* current = head;
+    Node<T>* current1 = other.head;
+   
+    result.itemCount = itemCount > other.itemCount ? itemCount : other.itemCount;
+    while ((current) && (current1)) {
+        current2->setItem(current->getItem() + current1->getItem());  
+        Node<T>* nextNodeptr = new Node<T>();
+        current2->setNext(nextNodeptr);               
+        current2 = current2->getNext(); 
+        current = current->getNext(); 
+        current1 = current1->getNext();         
     }
-    if (head == nullptr) {
-        head = other.getHead()->getNext();
+    if (current1) {
+        current2->setNext(current1);
     }
-    head = tmphead;
-    tmphead = nullptr;
-    return *this;
+    if(current) {
+        current2->setNext(current);
+    }
+    std::cout << std::endl;
+    return result;
 }
 
 template<typename T>
 FList<T>& FList<T>::operator+=(const FList& other)
 {
-    if (other.getHead() == nullptr) {
+    if (other.head == nullptr) {
         return *this;
     }
     if (head == nullptr) {
-        head = other.getHead();
-        itemCount = other.getItemCount();
+        head = other.head;
+        itemCount = other.itemCount;
         return *this;
     }
-    itemCount += other.getItemCount();
-    Node<T>* tmphead = head;
-    while (head != nullptr) {
-        head = head->getNext();
+    itemCount += other.itemCount;
+    Node<T>* current = head;
+    while (current->getNext()) {
+        current = current->getNext();
     }
-    head->setNext(other.getHead());
-    head = tmphead;
-    tmphead = nullptr;
+    current->setNext(other.head);
     return *this;
 }
 
@@ -128,13 +145,13 @@ bool FList<T>::insert(int position, const T& entry)
         }
         else {
             Node<T>* tmpPtr  = head;
-            for (int i{1}; i < position; ++i) {
-                head = head->getNext();
+            for (int i{1}; i < position - 1; ++i) {
+                tmpPtr = tmpPtr->getNext();
             }
-            Node<T>* tmp = head->getNext();
-            head->setNext(newNodePtr);
-            newNodePtr->setNext(tmp);
-            head = tmpPtr;
+            Node<T>* nxt = tmpPtr->getNext();
+            tmpPtr->setNext(newNodePtr);
+            newNodePtr->setNext(nxt);
+            
         }
         itemCount++;
     }
@@ -166,7 +183,7 @@ bool FList<T>::remove_at(int position)
         }
         else {
             Node<T>* tmphead = head;
-            for (int i{1}; i < position; ++i) {
+            for (int i{1}; i < position - 1; ++i) {
                 head = head->getNext();
             }
             Node<T>* tmpPtr = head->getNext();
@@ -198,7 +215,7 @@ T FList<T>::getEntry(int position)
     bool ableToGet = (position >= 1) && (position <= itemCount + 1);
     if (ableToGet) {
         Node<T>* tmphead = head;
-        for (int i{1}; i <= position; ++i) {
+        for (int i{1}; i < position; ++i) {
             head = head->getNext();
         }
         T item = head->getItem();
@@ -212,10 +229,10 @@ T FList<T>::getEntry(int position)
 template<typename T>
 void FList<T>::setEntry(int position, const T& entry)
 {
-    bool ableToSet = (position >= 1) && (position <= itemCount + 1);
+    bool ableToSet = (position >= 1) && (position <= itemCount);
     if (ableToSet) {
         Node<T>* tmphead = head;
-        for (int i{1}; i <= position; ++i) {
+        for (int i{1}; i < position; ++i) {
             head = head->getNext();
         }
         head->setItem(entry);
